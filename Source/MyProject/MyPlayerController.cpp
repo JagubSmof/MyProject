@@ -33,7 +33,9 @@ void AMyPlayerController::SetNewShootLocation(const FVector DestLocation)
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
-		MyPawn->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(MyPawn->GetActorLocation(), DestLocation));
+		FRotator fullRotation = UKismetMathLibrary::FindLookAtRotation(MyPawn->GetActorLocation(), DestLocation);
+		FRotator zOnlyRotation = FRotator(0, fullRotation.Yaw, 0);
+		MyPawn->SetActorRotation(zOnlyRotation);
 	}
 	else
 	{
