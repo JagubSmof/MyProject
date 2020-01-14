@@ -7,19 +7,23 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Engine/StaticMesh.h"
 
-AMyProjectProjectile::AMyProjectProjectile() 
+AMyProjectProjectile::AMyProjectProjectile()
 {
-	// Static reference to the mesh to use for the projectile
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("/Game/TwinStick/Meshes/TwinStickProjectile.TwinStickProjectile"));
+	//red = FLinearColor::Red;
+	//AMyProjectProjectile(red);
+}
 
-	// Create mesh component for the projectile sphere
-	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
-	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
-	ProjectileMesh->SetupAttachment(RootComponent);
-	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
-	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMyProjectProjectile::OnHit);		// set up a notification for when this component hits something
-	RootComponent = ProjectileMesh;
+AMyProjectProjectile::AMyProjectProjectile(FLinearColor colour) 
+{
+	setDefaultProjectileMesh();
+	setDefaultProjectileMovement();
+	setLight(colour);
+	// Die after 3 seconds by default
+	InitialLifeSpan = 3.0f;
+}
 
+void AMyProjectProjectile::setDefaultProjectileMovement()
+{
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = ProjectileMesh;
@@ -28,9 +32,42 @@ AMyProjectProjectile::AMyProjectProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
+}
 
-	// Die after 3 seconds by default
+void AMyProjectProjectile::setSpeed(int newSpeed)
+{
+	ProjectileMovement->InitialSpeed = newSpeed;
+	ProjectileMovement->MaxSpeed = newSpeed;
+}
+
+void AMyProjectProjectile::setDefaultProjectileMesh()
+{
+	// Static reference to the mesh to use for the projectile
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("/Game/TwinStick/Meshes/TwinStickProjectile.TwinStickProjectile"));
+
+	// Create mesh component for the projectile sphere
+	//if (!ProjectileMesh)
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
+	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
+	ProjectileMesh->SetupAttachment(RootComponent);
+	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
+	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMyProjectProjectile::OnHit);		// set up a notification for when this component hits something
+	RootComponent = ProjectileMesh;
 	InitialLifeSpan = 3.0f;
+}
+
+void AMyProjectProjectile::setDefaultLight()
+{
+	light = CreateDefaultSubobject<UPointLightComponent>(TEXT("Light"));
+	light->SetLightColor(FLinearColor::White, true);
+	light->SetupAttachment(RootComponent);
+}
+
+void AMyProjectProjectile::setLight(FLinearColor colour)
+{
+	light = CreateDefaultSubobject<UPointLightComponent>(TEXT("Light"));
+	light->SetLightColor(colour, true);
+	light->SetupAttachment(RootComponent);
 }
 
 void AMyProjectProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

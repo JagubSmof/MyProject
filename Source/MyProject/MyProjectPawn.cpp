@@ -12,14 +12,31 @@
 #include "Engine/StaticMesh.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+#include "Pistol.h"
 
 const FName AMyProjectPawn::MoveForwardBinding("MoveForward");
 const FName AMyProjectPawn::MoveRightBinding("MoveRight");
 const FName AMyProjectPawn::FireForwardBinding("FireForward");
 const FName AMyProjectPawn::FireRightBinding("FireRight");
+const FName AMyProjectPawn::FireBinding("FireBinding");
+
+void AMyProjectPawn::CreateDefaultPistol()
+{
+	defaultWeapon = CreateDefaultSubobject<APistol>(TEXT("DefaultPistol"));
+}
 
 AMyProjectPawn::AMyProjectPawn()
 {	
+	//for (TActorIterator<APistol> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+	//	if (ActorItr->GetName() == "yourName")
+
+	//APistol newPistol = APistol;
+	//defaultWeapon = &newPistol;
+	//equippedWeaponClass = FString("Pistol");
+
+	//defaultWeapon = FindObject<APistol>(GetLevel(), TEXT("Pistol1"));
+	CreateDefaultPistol();
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
 	// Create the mesh component
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
@@ -29,7 +46,7 @@ AMyProjectPawn::AMyProjectPawn()
 	
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
-	FireSound = FireAudio.Object;
+	FireSound = FireAudio.Object;//TODO: Get this from the weapon.
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -49,7 +66,19 @@ AMyProjectPawn::AMyProjectPawn()
 	// Weapon
 	GunOffset = FVector(90.f, 0.f, 0.f);
 	FireRate = 0.1f;
-	bCanFire = true;
+	//bCanFire = true;
+
+
+	// Create a decal in the world to show the cursor's location
+	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
+	CursorToWorld->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Decaul/M_Cursor_Decal.M_Cursor_Decal'"));
+	if (DecalMaterialAsset.Succeeded())
+	{
+		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
+	}
+	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
+	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 }
 
 void AMyProjectPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -61,6 +90,8 @@ void AMyProjectPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis(MoveRightBinding);
 	PlayerInputComponent->BindAxis(FireForwardBinding);
 	PlayerInputComponent->BindAxis(FireRightBinding);
+
+	PlayerInputComponent->BindAxis(FireBinding);
 }
 
 void AMyProjectPawn::Tick(float DeltaSeconds)
@@ -68,6 +99,7 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 	// Find movement direction
 	const float ForwardValue = GetInputAxisValue(MoveForwardBinding);
 	const float RightValue = GetInputAxisValue(MoveRightBinding);
+	const bool fireKeyDown = ( GetInputAxisValue(FireBinding) > 0);
 
 	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
 	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
@@ -76,33 +108,75 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 	const FVector Movement = MoveDirection * MoveSpeed * DeltaSeconds;
 
 	// If non-zero size, move this actor
+	const FRotator currentRotation = GetActorRotation();
+
 	if (Movement.SizeSquared() > 0.0f)
 	{
-		const FRotator NewRotation = Movement.Rotation();
+		//const FRotator NewRotation = Movement.Rotation();
 		FHitResult Hit(1.f);
-		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
+		RootComponent->MoveComponent(Movement, currentRotation, true, &Hit);
 		
 		if (Hit.IsValidBlockingHit())
 		{
 			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
 			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D) * (1.f - Hit.Time);
-			RootComponent->MoveComponent(Deflection, NewRotation, true);
+			RootComponent->MoveComponent(Deflection, currentRotation, true);
 		}
 	}
 	
 	// Create fire direction vector
+
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
 	const FVector FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
 
+	//Gonna do some fucky stuff here.
+
+
+	if (CursorToWorld != nullptr)
+	{
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		{
+			FHitResult TraceHitResult;
+			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+			FVector CursorFV = TraceHitResult.ImpactNormal;
+			FRotator CursorR = CursorFV.Rotation();
+			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
+			CursorToWorld->SetWorldRotation(CursorR);
+		}
+	}
+	else
+	{
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
+	}
+
+	if (defaultWeapon != nullptr)
+		defaultWeapon->Tick(DeltaSeconds);
+	else
+	{
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
+	}
+
+	//const FRotator FireRotation = FRotator(1, 1, 1);
+
+	if (fireKeyDown)
+		whichWeapon();
+	//else
+	//{
+	//	if (GEngine)
+	//		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Yellow, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
+	//}
+
 	// Try and fire a shot
-	FireShot(FireDirection);
+	//FireShot(FireDirection);
 }
 
 void AMyProjectPawn::FireShot(FVector FireDirection)
 {
 	// If it's ok to fire again
-	if (bCanFire == true)
+	if (true)
 	{
 		// If we are pressing fire stick in a direction
 		if (FireDirection.SizeSquared() > 0.0f)
@@ -115,11 +189,15 @@ void AMyProjectPawn::FireShot(FVector FireDirection)
 			if (World != NULL)
 			{
 				// spawn the projectile
-				World->SpawnActor<AMyProjectProjectile>(SpawnLocation, FireRotation);
+				whichWeapon();
+				//World->SpawnActor<AMyProjectProjectile>(SpawnLocation, FireRotation);
+				if (defaultWeapon != nullptr)
+					defaultWeapon->FireWeapon(SpawnLocation, FireRotation);
+				//World->SpawnActor<AMyProjectile>(SpawnLocation, FireRotation);
 			}
 
-			bCanFire = false;
-			World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMyProjectPawn::ShotTimerExpired, FireRate);
+			//bCanFire = false;
+			//World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMyProjectPawn::ShotTimerExpired, FireRate);
 
 			// try and play the sound if specified
 			if (FireSound != nullptr)
@@ -127,13 +205,34 @@ void AMyProjectPawn::FireShot(FVector FireDirection)
 				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 			}
 
-			bCanFire = false;
+			//bCanFire = false;
 		}
 	}
 }
 
-void AMyProjectPawn::ShotTimerExpired()
+void AMyProjectPawn::whichWeapon()
 {
-	bCanFire = true;
+	const FRotator FireRotation = GetActorRotation();
+	const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
+	if (equippedWeaponClass == "Rocket Launcher")
+	{
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("You don't have a rocket launcher"));
+	}
+	else
+	{
+		if (defaultWeapon != nullptr)
+			defaultWeapon->FireWeapon(SpawnLocation, FireRotation);
+		else
+		{
+			if (GEngine)
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
+		}
+	}
 }
+
+//void AMyProjectPawn::ShotTimerExpired()
+//{
+//	bCanFire = true;
+//}
 
