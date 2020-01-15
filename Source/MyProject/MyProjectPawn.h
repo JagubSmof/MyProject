@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Runtime/Engine/Classes/Components/DecalComponent.h"
+#include "Pistol.h"
 #include "MyProjectPawn.generated.h"
 
 UCLASS(Blueprintable)
@@ -11,7 +13,7 @@ class AMyProjectPawn : public APawn
 {
 	GENERATED_BODY()
 
-	/* The mesh component */
+	/** The mesh component */
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* ShipMeshComponent;
 
@@ -25,10 +27,19 @@ class AMyProjectPawn : public APawn
 
 public:
 	AMyProjectPawn();
+	void CreateDefaultPistol();
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		APistol* defaultWeapon;
 
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
-	FVector GunOffset;
+		FVector GunOffset;
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		FString equippedWeaponClass;
+
+	class UDecalComponent* CursorToWorld;
 	
 	/* How fast the weapon will fire */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
@@ -50,14 +61,14 @@ public:
 	/* Fire a shot in the specified direction */
 	void FireShot(FVector FireDirection);
 
-	/* Handler for the fire timer expiry */
-	void ShotTimerExpired();
+	void whichWeapon();
 
 	// Static names for axis bindings
 	static const FName MoveForwardBinding;
 	static const FName MoveRightBinding;
 	static const FName FireForwardBinding;
 	static const FName FireRightBinding;
+	static const FName FireBinding;
 
 private:
 
