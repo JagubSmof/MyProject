@@ -30,12 +30,12 @@ bool AWeapon::FireWeapon(FVector SpawnLocation, FRotator FireRotation)
 		if (ammoCount == 0)
 			return false;
 	}
-		return true;
+	return true;
 }
 
 void AWeapon::Tick(float deltaTime)
 {
-	if (coolDown > 0)
+	if (coolDown > 0 && ammoCount == 1)
 		coolDown -= deltaTime;
 }
 

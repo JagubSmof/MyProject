@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "Pistol.h"
+#include "Shotgun.h"
+#include "AssaultRifle.h"
+#include "MarksmanRifle.h"
 #include "MyProjectPawn.generated.h"
 
 UCLASS(Blueprintable)
@@ -25,12 +28,21 @@ class AMyProjectPawn : public APawn
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	APistol* defaultWeapon;
+	AShotgun* currentShotgun;
+	AAssaultRifle* currentAssaultRifle;
+	AMarksmanRifle* currentMarksmanRifle;
+
 public:
 	AMyProjectPawn();
 	void CreateDefaultPistol();
 
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
-		APistol* defaultWeapon;
+	void equipShotgun(AShotgun*);
+	void equipAssaultRifle(AAssaultRifle*);
+	void equipMarksmanRifle(AMarksmanRifle*);
+
+	//UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		
 
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
