@@ -25,17 +25,27 @@ void AMyProjectPawn::CreateDefaultPistol()
 	defaultWeapon = CreateDefaultSubobject<APistol>(TEXT("DefaultPistol"));
 }
 
+void AMyProjectPawn::equipShotgun(AShotgun* shotgun)
+{
+	currentShotgun = shotgun;
+	equippedWeaponClass = FString("Shotgun");
+}
+void AMyProjectPawn::equipAssaultRifle(AAssaultRifle* assaultRifle)
+{
+	currentAssaultRifle = assaultRifle;
+	equippedWeaponClass = "Assault Rifle";
+}
+void AMyProjectPawn::equipMarksmanRifle(AMarksmanRifle* marksmanRifle)
+{
+	currentMarksmanRifle = marksmanRifle;
+	equippedWeaponClass = "Marksman Rifle";
+}
+
 AMyProjectPawn::AMyProjectPawn()
-{	
-	//for (TActorIterator<APistol> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
-	//	if (ActorItr->GetName() == "yourName")
-
-	//APistol newPistol = APistol;
-	//defaultWeapon = &newPistol;
-	//equippedWeaponClass = FString("Pistol");
-
-	//defaultWeapon = FindObject<APistol>(GetLevel(), TEXT("Pistol1"));
+{
 	CreateDefaultPistol();
+
+	equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun")));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
 	// Create the mesh component
@@ -130,8 +140,7 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
 	const FVector FireDirection = FVector(FireForwardValue, FireRightValue, 0.f);
 
-	//Gonna do some fucky stuff here.
-
+	//Next bit's scary.
 
 	if (CursorToWorld != nullptr)
 	{
@@ -153,13 +162,18 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 
 	if (defaultWeapon != nullptr)
 		defaultWeapon->Tick(DeltaSeconds);
-	else
-	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
-	}
+	if (currentShotgun != nullptr)
+		currentShotgun->Tick(DeltaSeconds);
+	if (currentAssaultRifle != nullptr)
+		currentAssaultRifle->Tick(DeltaSeconds);;
+	if (currentMarksmanRifle != nullptr)
+		currentMarksmanRifle->Tick(DeltaSeconds);;
 
-	//const FRotator FireRotation = FRotator(1, 1, 1);
+	//else
+	//{
+	//	if (GEngine)
+	//		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
+	//}
 
 	if (fireKeyDown)
 		whichWeapon();
@@ -168,9 +182,6 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 	//	if (GEngine)
 	//		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Yellow, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
 	//}
-
-	// Try and fire a shot
-	//FireShot(FireDirection);
 }
 
 void AMyProjectPawn::FireShot(FVector FireDirection)
@@ -219,6 +230,21 @@ void AMyProjectPawn::whichWeapon()
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("You don't have a rocket launcher"));
 	}
+	else if (equippedWeaponClass == "Shotgun")
+	{
+		if (!currentShotgun->FireWeapon(SpawnLocation, FireRotation))
+			equippedWeaponClass = "Pistol";
+	}
+	else if (equippedWeaponClass == "Marksman Rifle")
+	{
+		if (!currentMarksmanRifle->FireWeapon(SpawnLocation, FireRotation))
+			equippedWeaponClass = "Pistol";
+	}
+	else if (equippedWeaponClass == "Assault Rifle")
+	{
+		if (!currentAssaultRifle->FireWeapon(SpawnLocation, FireRotation))
+			equippedWeaponClass = "Pistol";
+	}
 	else
 	{
 		if (defaultWeapon != nullptr)
@@ -230,9 +256,3 @@ void AMyProjectPawn::whichWeapon()
 		}
 	}
 }
-
-//void AMyProjectPawn::ShotTimerExpired()
-//{
-//	bCanFire = true;
-//}
-

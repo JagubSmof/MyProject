@@ -5,18 +5,17 @@
 #include "CoreMinimal.h"
 #include "Weapon.h"
 #include "NormalProjectile.h"
-#include "Pistol.generated.h"
+#include "Shotgun.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MYPROJECT_API APistol : public AWeapon
+class MYPROJECT_API AShotgun : public AWeapon
 {
 	GENERATED_BODY()
-
 public:
-	APistol();
-	void LaunchProjectile(FVector SpawnLocation, FRotator FireRotation) override;
+	AShotgun();
 
+	void LaunchProjectile(FVector, FRotator);
 };

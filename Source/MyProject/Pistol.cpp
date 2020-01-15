@@ -8,7 +8,7 @@ APistol::APistol()
 	//ANormalProjectile newProjectile = ANormalProjectile();
 	weaponClass = FString("Pistol");
 	damage = 1;
-	speed = 2250;
+	speed = 3250;
 	projectileColour = FLinearColor::Red;
 }
 
