@@ -7,6 +7,9 @@ AWeapon::AWeapon()
 	fireRate = 2;
 	coolDown = 0;
 	ammoCount = -1;
+	// Cache our sound effect
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
+	FireSound = FireAudio.Object;//TODO: Get this working.
 }
 
 AWeapon::~AWeapon()
@@ -22,6 +25,11 @@ bool AWeapon::FireWeapon(FVector SpawnLocation, FRotator FireRotation)
 		else
 			coolDown = 1;
 
+		if (FireSound != nullptr)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
+
 		LaunchProjectile(SpawnLocation, FireRotation);
 
 		if (ammoCount > 0)
@@ -35,7 +43,7 @@ bool AWeapon::FireWeapon(FVector SpawnLocation, FRotator FireRotation)
 
 void AWeapon::Tick(float deltaTime)
 {
-	if (coolDown > 0 && ammoCount == 1)
+	if (coolDown > 0)//&& ammoCount == 1
 		coolDown -= deltaTime;
 }
 

@@ -22,7 +22,8 @@ void APistol::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
 	{
 		ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
 		//projectile->initialize(damage, speed, projectileColour);
-		projectile->setLight(projectileColour);
+		if (projectile)
+			projectile->setLight(projectileColour);
 		//projectile->printFunction();
 	}
 }

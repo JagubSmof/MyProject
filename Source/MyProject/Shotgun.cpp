@@ -13,9 +13,18 @@ AShotgun::AShotgun()
 	ammoCount = 10;
 }
 
-void spawnTing(UWorld* World)
+void AShotgun::spawnTing(UWorld* World, FVector SpawnLocation, FRotator rotation)
 {
-
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Firing! Allegedly..."));
+	ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(SpawnLocation, rotation);
+	if (projectile)
+		projectile->setLight(projectileColour);
+	else
+	{
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("No projectile fired!"));
+	}
 }
 
 void AShotgun::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
@@ -37,21 +46,12 @@ void AShotgun::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
 	UWorld* const World = GetWorld();
 	if (World != NULL)
 	{
-		ANormalProjectile* projectile1 = World->SpawnActor<ANormalProjectile>(SpawnLocation, bullet1);
-		projectile1->setLight(projectileColour);
-		//if (!projectile1)
-		//	if (GEngine)
-		//		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("WTF"));
-		ANormalProjectile* projectile2 = World->SpawnActor<ANormalProjectile>(SpawnLocation, bullet2);
-		projectile2->setLight(projectileColour);
-		//ANormalProjectile* projectile3 = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
-		//projectile3->setLight(projectileColour);
-		//ANormalProjectile* projectile4 = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
-		//projectile4->setLight(projectileColour);
-		//ANormalProjectile* projectile5 = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
-		//projectile5->setLight(projectileColour);
-		//ANormalProjectile* projectile6 = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
-		//projectile6->setLight(projectileColour);
+		spawnTing(World, SpawnLocation, bullet1);
+		spawnTing(World, SpawnLocation, bullet2);
+		spawnTing(World, SpawnLocation, bullet3);
+		spawnTing(World, SpawnLocation, bullet4);
+		spawnTing(World, SpawnLocation, bullet5);
+		spawnTing(World, SpawnLocation, bullet6);
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Cyan, TEXT("Firing! Allegedly..."));
 	}

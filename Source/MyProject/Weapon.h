@@ -4,6 +4,9 @@
 
 #include "Projectile.h"
 #include "CoreMinimal.h"
+#include "ConstructorHelpers.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 #include "Weapon.generated.h"
 
 /**
@@ -15,6 +18,10 @@ class AWeapon : public AActor
 	GENERATED_BODY()
 
 public:
+
+	/** Sound to play each time we fire */
+	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)
+		class USoundBase* FireSound;
 
 	UPROPERTY(EditAnywhere)
 		bool rainbowGun;

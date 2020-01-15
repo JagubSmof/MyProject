@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Weapon.h"
+#include "NormalProjectile.h"
 #include "AssaultRifle.generated.h"
 
 /**
@@ -13,5 +14,7 @@ UCLASS()
 class MYPROJECT_API AAssaultRifle : public AWeapon
 {
 	GENERATED_BODY()
-	
+public:
+	AAssaultRifle();
+	void LaunchProjectile(FVector, FRotator);
 };
