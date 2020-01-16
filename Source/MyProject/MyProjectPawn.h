@@ -36,14 +36,21 @@ class AMyProjectPawn : public APawn
 	float floatAmount;
 	float relativeZ;
 
-public:
-	AMyProjectPawn();
-	void CreateDefaultPistol();
-
 	void checkGravity();
 	void equipShotgun(AShotgun*);
 	void equipAssaultRifle(AAssaultRifle*);
 	void equipMarksmanRifle(AMarksmanRifle*);
+
+public:
+	AMyProjectPawn();
+	void CreateDefaultPistol();
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		void equipShotgun();
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		void equipAssaultRifle();
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		void equipMarksmanRifle();
 
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 		APistol* defaultWeapon;

@@ -43,6 +43,15 @@ void AMyProjectPawn::equipMarksmanRifle(AMarksmanRifle* marksmanRifle)
 	equippedWeaponClass = "Marksman Rifle";
 }
 
+void AMyProjectPawn::equipShotgun()
+{ equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun"))); }
+
+void AMyProjectPawn::equipAssaultRifle()
+{ equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR"))); }
+
+void AMyProjectPawn::equipMarksmanRifle()
+{ equipMarksmanRifle(CreateDefaultSubobject<AMarksmanRifle>(TEXT("Testing MR"))); }
+
 void AMyProjectPawn::SetWeaponsNull()
 {
 	defaultWeapon = 0;

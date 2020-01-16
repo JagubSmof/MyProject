@@ -14,11 +14,12 @@ class MYPROJECT_API AProjectile : public AMyProjectProjectile
 {
 	GENERATED_BODY()
 
-	int damage;
 	int speed;
 
 public:
 	AProjectile();
+	void setDamage(int);
 	virtual void initialize(int, int, FLinearColor);
-
+	UPROPERTY(EditAnywhere)
+		int damage;
 };
