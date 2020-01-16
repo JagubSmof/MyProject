@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "Pistol.h"
+#include "Shotgun.h"
+#include "AssaultRifle.h"
+#include "MarksmanRifle.h"
 #include "MyProjectPawn.generated.h"
 
 UCLASS(Blueprintable)
@@ -25,12 +28,38 @@ class AMyProjectPawn : public APawn
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	void SetWeaponsNull();
+	//void CreateMovementComponent();
+	void TickWeapons(float);
+
+	float originZ;
+	float floatAmount;
+	float relativeZ;
+
+	void checkGravity();
+	void equipShotgun(AShotgun*);
+	void equipAssaultRifle(AAssaultRifle*);
+	void equipMarksmanRifle(AMarksmanRifle*);
+
 public:
 	AMyProjectPawn();
 	void CreateDefaultPistol();
 
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		void equipShotgun();
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		void equipAssaultRifle();
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		void equipMarksmanRifle();
+
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 		APistol* defaultWeapon;
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		AShotgun* currentShotgun;
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		AAssaultRifle* currentAssaultRifle;
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		AMarksmanRifle* currentMarksmanRifle;
 
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )

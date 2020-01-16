@@ -17,8 +17,6 @@ class MYPROJECT_API APistol : public AWeapon
 
 public:
 	APistol();
-
-public:
 	void LaunchProjectile(FVector SpawnLocation, FRotator FireRotation) override;
 
 };

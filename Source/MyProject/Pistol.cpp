@@ -6,9 +6,10 @@
 APistol::APistol()
 {
 	//ANormalProjectile newProjectile = ANormalProjectile();
+	fireRate = 2;
 	weaponClass = FString("Pistol");
 	damage = 1;
-	speed = 2250;
+	speed = 3250;
 	projectileColour = FLinearColor::Red;
 }
 
@@ -24,6 +25,10 @@ void APistol::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
 		//projectile->initialize(damage, speed, projectileColour);
 		if (projectile)
 			projectile->setLight(projectileColour);
+		{
+			projectile->setLight(GetColour());
+			projectile->setDamage(damage);
+		}
 		//projectile->printFunction();
 	}
 }

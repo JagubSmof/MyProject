@@ -25,8 +25,60 @@ void AMyProjectPawn::CreateDefaultPistol()
 	defaultWeapon = CreateDefaultSubobject<APistol>(TEXT("DefaultPistol"));
 }
 
+void AMyProjectPawn::equipShotgun(AShotgun* shotgun)
+{
+	currentShotgun = shotgun;
+	equippedWeaponClass = FString("Shotgun");
+}
+
+void AMyProjectPawn::equipAssaultRifle(AAssaultRifle* assaultRifle)
+{
+	currentAssaultRifle = assaultRifle;
+	equippedWeaponClass = "Assault Rifle";
+}
+
+void AMyProjectPawn::equipMarksmanRifle(AMarksmanRifle* marksmanRifle)
+{
+	currentMarksmanRifle = marksmanRifle;
+	equippedWeaponClass = "Marksman Rifle";
+}
+
+void AMyProjectPawn::equipShotgun()
+{ equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun"))); }
+
+void AMyProjectPawn::equipAssaultRifle()
+{ equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR"))); }
+
+void AMyProjectPawn::equipMarksmanRifle()
+{ equipMarksmanRifle(CreateDefaultSubobject<AMarksmanRifle>(TEXT("Testing MR"))); }
+
+void AMyProjectPawn::SetWeaponsNull()
+{
+	defaultWeapon = 0;
+	currentShotgun = 0;
+	currentAssaultRifle = 0;
+	currentMarksmanRifle = 0;
+}
+
+void AMyProjectPawn::TickWeapons(float DeltaSeconds)
+{
+	if (defaultWeapon != 0)
+		defaultWeapon->Tick(DeltaSeconds);
+	else
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("There is no weapon."));
+	if (currentShotgun != 0)
+		currentShotgun->Tick(DeltaSeconds);
+	if (currentAssaultRifle != 0)
+		currentAssaultRifle->Tick(DeltaSeconds);
+	if (currentMarksmanRifle != 0)
+		currentMarksmanRifle->Tick(DeltaSeconds);
+}
+
 AMyProjectPawn::AMyProjectPawn()
 {	
+	floatAmount = 3;
+
 	//for (TActorIterator<APistol> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
 	//	if (ActorItr->GetName() == "yourName")
 
@@ -37,7 +89,12 @@ AMyProjectPawn::AMyProjectPawn()
 	//defaultWeapon = FindObject<APistol>(GetLevel(), TEXT("Pistol1"));
 	CreateDefaultPistol();
 
+	//equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun")));
+	//equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR")));
+	//equipMarksmanRifle(CreateDefaultSubobject<AMarksmanRifle>(TEXT("Testing MR")));
+
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/AAAAAAAAAAAAAA"));
 	// Create the mesh component
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMeshComponent;
@@ -72,13 +129,15 @@ AMyProjectPawn::AMyProjectPawn()
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Decaul/M_Cursor_Decal.M_Cursor_Decal'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Decal/M_Cursor_Decal.M_Cursor_Decal'"));
 	if (DecalMaterialAsset.Succeeded())
 	{
 		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
 	}
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
+	originZ = GetActorLocation().Z;
+	relativeZ = originZ;
 }
 
 void AMyProjectPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -159,6 +218,9 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
 	}
 
+	checkGravity();
+	TickWeapons(DeltaSeconds);
+
 	//const FRotator FireRotation = FRotator(1, 1, 1);
 
 	if (fireKeyDown)
@@ -219,6 +281,21 @@ void AMyProjectPawn::whichWeapon()
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("You don't have a rocket launcher"));
 	}
+	else if (equippedWeaponClass == "Shotgun")
+	{
+		if (!currentShotgun->FireWeapon(SpawnLocation, FireRotation))
+			equippedWeaponClass = "Pistol";
+	}
+	else if (equippedWeaponClass == "Marksman Rifle")
+	{
+		if (!currentMarksmanRifle->FireWeapon(SpawnLocation, FireRotation))
+			equippedWeaponClass = "Pistol";
+	}
+	else if (equippedWeaponClass == "Assault Rifle")
+	{
+		if (!currentAssaultRifle->FireWeapon(SpawnLocation, FireRotation))
+			equippedWeaponClass = "Pistol";
+	}
 	else
 	{
 		if (defaultWeapon != nullptr)
@@ -226,7 +303,7 @@ void AMyProjectPawn::whichWeapon()
 		else
 		{
 			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("There is no weapon."));
 		}
 	}
 }
@@ -236,3 +313,21 @@ void AMyProjectPawn::whichWeapon()
 //	bCanFire = true;
 //}
 
+void AMyProjectPawn::checkGravity()
+{
+	//FVector offset = FVector(0, 0, 50);
+	FHitResult HitResult;
+	FVector StartTrace = GetActorLocation();// +offset;
+	FVector DownVector = FVector(0, 0, -1);
+	FVector EndVector = ((DownVector * 5000.0f) + StartTrace);
+	//FVector moveUpLimit;
+	//GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndVector, ECollisionChannel TraceChannel, const FCollisionQueryParams& Params, /* = FCollisionQueryParams::DefaultQueryParam */, const FCollisionResponseParams& ResponseParam /* = FCollisionResponseParams::DefaultResponseParam */);
+	GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndVector, ECollisionChannel::ECC_WorldStatic, FCollisionQueryParams::DefaultQueryParam, FCollisionResponseParams::DefaultResponseParam);
+	float ZDiff = HitResult.Location.Z - relativeZ;
+	FHitResult Hit(1.f);
+	relativeZ += ZDiff;
+	RootComponent->MoveComponent(FVector(0, 0, ZDiff), GetActorRotation(), true, &Hit);
+	//RootComponent->SetWorldLocation(FVector(GetActorLocation().X, GetActorLocation().Y, HitResult.Location.Z + floatAmount));
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%f"), ZDiff));
+}
