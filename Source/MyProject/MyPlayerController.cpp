@@ -31,7 +31,6 @@ void AMyPlayerController::MoveToMouseCursor()
 void AMyPlayerController::SetNewShootLocation(const FVector DestLocation)
 {
 	APawn* const MyPawn = GetPawn();
-	//ACharacter* const MyPawn = GetCharacter();
 	if (MyPawn)
 	{
 		FRotator fullRotation = UKismetMathLibrary::FindLookAtRotation(MyPawn->GetActorLocation(), DestLocation);
@@ -41,7 +40,7 @@ void AMyPlayerController::SetNewShootLocation(const FVector DestLocation)
 	else
 	{
 		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("pawn not found"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
 	}
 }
 

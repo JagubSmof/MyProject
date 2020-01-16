@@ -25,6 +25,10 @@ void APistol::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
 		//projectile->initialize(damage, speed, projectileColour);
 		if (projectile)
 			projectile->setLight(projectileColour);
+		{
+			projectile->setLight(GetColour());
+			projectile->setDamage(damage);
+		}
 		//projectile->printFunction();
 	}
 }

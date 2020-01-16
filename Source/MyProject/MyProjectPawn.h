@@ -9,19 +9,16 @@
 #include "Shotgun.h"
 #include "AssaultRifle.h"
 #include "MarksmanRifle.h"
-#include "GameFramework/DefaultPawn.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "MyProjectPawn.generated.h"
 
 UCLASS(Blueprintable)
-class AMyProjectPawn : public APawn//ADefaultPawn
+class AMyProjectPawn : public APawn
 {
 	GENERATED_BODY()
 
 	/** The mesh component */
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* ShipMeshComponent;
-	//class USkeletalMeshComponent* ShipMeshComponent;
 
 	/** The camera */
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -31,38 +28,38 @@ class AMyProjectPawn : public APawn//ADefaultPawn
 	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
-	//UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	//class UPawnMovementComponent* MovementComponent;
-	//class UCharacterMovementComponent* MovementComponent;
-
-	APistol* defaultWeapon;
-	AShotgun* currentShotgun;
-	AAssaultRifle* currentAssaultRifle;
-	AMarksmanRifle* currentMarksmanRifle;
-
 	void SetWeaponsNull();
-	void CreateMovementComponent();
+	//void CreateMovementComponent();
 	void TickWeapons(float);
 
-public:
-	AMyProjectPawn();
-	
-	void CreateDefaultPistol();
+	float originZ;
+	float floatAmount;
+	float relativeZ;
 
 	void checkGravity();
-
 	void equipShotgun(AShotgun*);
 	void equipAssaultRifle(AAssaultRifle*);
 	void equipMarksmanRifle(AMarksmanRifle*);
 
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
-		FRotator MovementRotation;
+public:
+	AMyProjectPawn();
+	void CreateDefaultPistol();
+
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
+		void equipShotgun();
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
+		void equipAssaultRifle();
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
+		void equipMarksmanRifle();
 
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
-		AActor* LowerHalf;
-
+		APistol* defaultWeapon;
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
-		FRotator LowerRotation;
+		AShotgun* currentShotgun;
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		AAssaultRifle* currentAssaultRifle;
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		AMarksmanRifle* currentMarksmanRifle;
 
 	/** Offset from the ships location to spawn projectiles */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite )
@@ -80,6 +77,10 @@ public:
 	/* The speed our ship moves around the level */
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 	float MoveSpeed;
+
+	/** Sound to play each time we fire */
+	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)
+	class USoundBase* FireSound;
 
 	// Begin Actor Interface
 	virtual void Tick(float DeltaSeconds) override;
@@ -109,8 +110,6 @@ private:
 public:
 	/** Returns ShipMeshComponent subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetShipMeshComponent() const { return ShipMeshComponent; }
-	/** Returns ShipMeshComponent subobject **/
-	//FORCEINLINE class USkeletalMeshComponent* GetShipMeshComponent() const { return ShipMeshComponent; }
 	/** Returns CameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 	/** Returns CameraBoom subobject **/
