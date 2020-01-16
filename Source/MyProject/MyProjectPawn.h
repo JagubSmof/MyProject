@@ -45,11 +45,11 @@ public:
 	AMyProjectPawn();
 	void CreateDefaultPistol();
 
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
 		void equipShotgun();
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
 		void equipAssaultRifle();
-	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
 		void equipMarksmanRifle();
 
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
