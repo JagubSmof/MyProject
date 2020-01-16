@@ -6,6 +6,7 @@
 APistol::APistol()
 {
 	//ANormalProjectile newProjectile = ANormalProjectile();
+	fireRate = 2;
 	weaponClass = FString("Pistol");
 	damage = 1;
 	speed = 3250;

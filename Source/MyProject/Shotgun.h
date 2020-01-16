@@ -14,6 +14,7 @@ UCLASS()
 class MYPROJECT_API AShotgun : public AWeapon
 {
 	GENERATED_BODY()
+	void spawnTing(UWorld*, FVector, FRotator);
 public:
 	AShotgun();
 

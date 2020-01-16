@@ -3,3 +3,31 @@
 
 #include "AssaultRifle.h"
 
+AAssaultRifle::AAssaultRifle()
+{
+	//ANormalProjectile newProjectile = ANormalProjectile();
+	weaponClass = FString("Pistol");
+	fireRate = 5;
+	coolDown = 0;
+	damage = 1;
+	speed = 3500;
+	projectileColour = FLinearColor::Green;
+	ammoCount = 30;
+	rainbowGun = true;
+}
+
+void AAssaultRifle::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
+{
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("Firing! Allegedly..."));
+
+	UWorld* const World = GetWorld();
+	if (World != NULL)
+	{
+		ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
+		//projectile->initialize(damage, speed, projectileColour);
+		if (projectile)
+			projectile->setLight(GetColour());
+		//projectile->printFunction();
+	}
+}
