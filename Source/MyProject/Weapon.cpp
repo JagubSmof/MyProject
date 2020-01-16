@@ -61,7 +61,7 @@ FLinearColor AWeapon::GetColour()
 		else//if (random_number == 1)
 			return FLinearColor::Yellow;
 		//if (GEngine)
-		//	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("FUCK!"));
+		//	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("RNG is shit"));
 	}
 	else return projectileColour;
 }
