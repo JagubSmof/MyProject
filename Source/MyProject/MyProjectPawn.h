@@ -40,7 +40,9 @@ class AMyProjectPawn : public APawn//ADefaultPawn
 	AAssaultRifle* currentAssaultRifle;
 	AMarksmanRifle* currentMarksmanRifle;
 
+	void SetWeaponsNull();
 	void CreateMovementComponent();
+	void TickWeapons(float);
 
 public:
 	AMyProjectPawn();

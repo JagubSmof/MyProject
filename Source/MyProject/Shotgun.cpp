@@ -10,7 +10,8 @@ AShotgun::AShotgun()
 	damage = 1;
 	speed = 2500;
 	projectileColour = FLinearColor::Green;
-	ammoCount = 10;
+	ammoCount = 8;
+	fireRate = 0.75;
 }
 
 void AShotgun::spawnTing(UWorld* World, FVector SpawnLocation, FRotator rotation)
@@ -19,7 +20,7 @@ void AShotgun::spawnTing(UWorld* World, FVector SpawnLocation, FRotator rotation
 		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Firing! Allegedly..."));
 	ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(SpawnLocation, rotation);
 	if (projectile)
-		projectile->setLight(projectileColour);
+		projectile->setLight(GetColour());
 	else
 	{
 		if (GEngine)

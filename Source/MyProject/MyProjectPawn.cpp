@@ -51,13 +51,21 @@ void AMyProjectPawn::CreateMovementComponent()
 	//MovementComponent.defa
 }
 
+void AMyProjectPawn::SetWeaponsNull()
+{
+	defaultWeapon = 0;
+	currentShotgun = 0;
+	currentAssaultRifle = 0;
+	currentMarksmanRifle = 0;
+}
+
 AMyProjectPawn::AMyProjectPawn()
 {
 	//CreateMovementComponent();
 	CreateDefaultPistol();
 
 	//equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun")));
-	//equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR")));
+	equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR")));
 	//equipMarksmanRifle(CreateDefaultSubobject<AMarksmanRifle>(TEXT("Testing MR")));
 
 	static ConstructorHelpers::FObjectFinder < UStaticMesh > ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
@@ -91,7 +99,6 @@ AMyProjectPawn::AMyProjectPawn()
 	//FireRate = 0.1f;
 	//bCanFire = true;
 
-
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	CursorToWorld->SetupAttachment(RootComponent);
@@ -115,6 +122,21 @@ void AMyProjectPawn::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAxis(FireRightBinding);
 
 	PlayerInputComponent->BindAxis(FireBinding);
+}
+
+void AMyProjectPawn::TickWeapons(float DeltaSeconds)
+{
+	if (defaultWeapon != 0)
+		defaultWeapon->Tick(DeltaSeconds);
+	else
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("There is no weapon."));
+	if (currentShotgun != 0)
+		currentShotgun->Tick(DeltaSeconds);
+	if (currentAssaultRifle != 0)
+		currentAssaultRifle->Tick(DeltaSeconds);
+	if (currentMarksmanRifle != 0)
+		currentMarksmanRifle->Tick(DeltaSeconds);
 }
 
 void AMyProjectPawn::Tick(float DeltaSeconds)
@@ -159,6 +181,7 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 	
 	checkGravity();
 	// Create fire direction vector
+	TickWeapons(DeltaSeconds);
 
 	const float FireForwardValue = GetInputAxisValue(FireForwardBinding);
 	const float FireRightValue = GetInputAxisValue(FireRightBinding);
@@ -177,6 +200,9 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
+		else
+			if (GEngine)
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("Cursor not found"));
 	}
 	else
 	{
@@ -184,57 +210,46 @@ void AMyProjectPawn::Tick(float DeltaSeconds)
 			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Cursor not found"));
 	}
 
-	//else
-	//{
-	//	if (GEngine)
-	//		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Green, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
-	//}
-
 	if (fireKeyDown)
 		whichWeapon();
-	//else
-	//{
-	//	if (GEngine)
-	//		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Yellow, TEXT("FUUUUUUUUUUUU. Classic Rage Comics xd"));
-	//}
 }
 
-void AMyProjectPawn::FireShot(FVector FireDirection)
-{
-	// If it's ok to fire again
-	if (true)
-	{
-		// If we are pressing fire stick in a direction
-		if (FireDirection.SizeSquared() > 0.0f)
-		{
-			const FRotator FireRotation = FireDirection.Rotation();
-			// Spawn projectile at an offset from this pawn
-			const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
-
-			UWorld* const World = GetWorld();
-			if (World != NULL)
-			{
-				// spawn the projectile
-				whichWeapon();
-				//World->SpawnActor<AMyProjectProjectile>(SpawnLocation, FireRotation);
-				if (defaultWeapon != nullptr)
-					defaultWeapon->FireWeapon(SpawnLocation, FireRotation);
-				//World->SpawnActor<AMyProjectile>(SpawnLocation, FireRotation);
-			}
-
-			//bCanFire = false;
-			//World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMyProjectPawn::ShotTimerExpired, FireRate);
-
-			// try and play the sound if specified
-			//if (FireSound != nullptr)
-			//{
-			//	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-			//}
-
-			//bCanFire = false;
-		}
-	}
-}
+//void AMyProjectPawn::FireShot(FVector FireDirection)
+//{
+//	// If it's ok to fire again
+//	if (true)
+//	{
+//		// If we are pressing fire stick in a direction
+//		if (FireDirection.SizeSquared() > 0.0f)
+//		{
+//			const FRotator FireRotation = FireDirection.Rotation();
+//			// Spawn projectile at an offset from this pawn
+//			const FVector SpawnLocation = GetActorLocation() + FireRotation.RotateVector(GunOffset);
+//
+//			UWorld* const World = GetWorld();
+//			if (World != NULL)
+//			{
+//				// spawn the projectile
+//				whichWeapon();
+//				//World->SpawnActor<AMyProjectProjectile>(SpawnLocation, FireRotation);
+//				if (defaultWeapon != nullptr)
+//					defaultWeapon->FireWeapon(SpawnLocation, FireRotation);
+//				//World->SpawnActor<AMyProjectile>(SpawnLocation, FireRotation);
+//			}
+//
+//			//bCanFire = false;
+//			//World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &AMyProjectPawn::ShotTimerExpired, FireRate);
+//
+//			// try and play the sound if specified
+//			//if (FireSound != nullptr)
+//			//{
+//			//	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+//			//}
+//
+//			//bCanFire = false;
+//		}
+//	}
+//}
 
 void AMyProjectPawn::checkGravity()
 {

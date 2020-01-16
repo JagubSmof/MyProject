@@ -5,8 +5,10 @@
 #include "Projectile.h"
 #include "CoreMinimal.h"
 #include "ConstructorHelpers.h"
+#include "Math/RandomStream.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundBase.h"
+//#include "random"
 #include "Weapon.generated.h"
 
 /**
@@ -18,6 +20,8 @@ class AWeapon : public AActor
 	GENERATED_BODY()
 
 public:
+
+	FLinearColor GetColour();
 
 	/** Sound to play each time we fire */
 	UPROPERTY(Category = Audio, EditAnywhere, BlueprintReadWrite)

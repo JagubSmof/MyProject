@@ -7,11 +7,13 @@ AAssaultRifle::AAssaultRifle()
 {
 	//ANormalProjectile newProjectile = ANormalProjectile();
 	weaponClass = FString("Pistol");
-	coolDown = 5;
+	fireRate = 5;
+	coolDown = 0;
 	damage = 1;
 	speed = 3500;
-	projectileColour = FLinearColor::Red;
+	projectileColour = FLinearColor::Green;
 	ammoCount = 30;
+	rainbowGun = true;
 }
 
 void AAssaultRifle::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
@@ -25,7 +27,7 @@ void AAssaultRifle::LaunchProjectile(FVector SpawnLocation, FRotator FireRotatio
 		ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
 		//projectile->initialize(damage, speed, projectileColour);
 		if (projectile)
-			projectile->setLight(projectileColour);
+			projectile->setLight(GetColour());
 		//projectile->printFunction();
 	}
 }
