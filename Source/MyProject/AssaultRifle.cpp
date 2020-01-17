@@ -11,7 +11,7 @@ AAssaultRifle::AAssaultRifle()
 	coolDown = 0;
 	damage = 1;
 	speed = 3500;
-	projectileColour = FLinearColor::Green;
+	projectileColour = FLinearColor::Blue;
 	ammoCount = 30;
 	rainbowGun = false;
 	FRandomStream RandomStream;
@@ -19,6 +19,8 @@ AAssaultRifle::AAssaultRifle()
 	int random_number = RandomStream.RandRange(1, 4);
 	if (random_number >= 3.2f)
 		rainbowGun = true;
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/Audio/Normal_Shot"));
+	FireSound = FireAudio.Object;
 }
 
 void AAssaultRifle::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)
@@ -26,7 +28,7 @@ void AAssaultRifle::LaunchProjectile(FVector SpawnLocation, FRotator FireRotatio
 	//if (GEngine)
 	//	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("Firing! Allegedly..."));
 
-	UWorld* const World = GetWorld();
+	//UWorld* const World = GetWorld();
 	if (World != NULL)
 	{
 		ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(SpawnLocation, FireRotation);
@@ -38,4 +40,6 @@ void AAssaultRifle::LaunchProjectile(FVector SpawnLocation, FRotator FireRotatio
 		}
 		//projectile->printFunction();
 	}
+	//if (GEngine)
+	//	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::White, TEXT("There is no world apparently xD"));
 }

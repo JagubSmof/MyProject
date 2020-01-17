@@ -45,11 +45,20 @@ public:
 	AMyProjectPawn();
 	void CreateDefaultPistol();
 
+<<<<<<< Updated upstream
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 		void equipShotgun();
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
 		void equipAssaultRifle();
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+=======
+	//UPROPERTY(Category = Gameplay, BlueprintReadWrite)
+	UFUNCTION(BlueprintCallable)
+		void equipShotgun();
+	UFUNCTION(BlueprintCallable)
+		void equipAssaultRifle();
+	UFUNCTION(BlueprintCallable)
+>>>>>>> Stashed changes
 		void equipMarksmanRifle();
 
 	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)

@@ -29,28 +29,52 @@ void AMyProjectPawn::equipShotgun(AShotgun* shotgun)
 {
 	currentShotgun = shotgun;
 	equippedWeaponClass = FString("Shotgun");
+	//shotgun->World = GetWorld();
 }
 
 void AMyProjectPawn::equipAssaultRifle(AAssaultRifle* assaultRifle)
 {
 	currentAssaultRifle = assaultRifle;
 	equippedWeaponClass = "Assault Rifle";
+	//assaultRifle->World = GetWorld();
 }
 
 void AMyProjectPawn::equipMarksmanRifle(AMarksmanRifle* marksmanRifle)
 {
 	currentMarksmanRifle = marksmanRifle;
 	equippedWeaponClass = "Marksman Rifle";
+	//marksmanRifle->World = GetWorld();
 }
 
 void AMyProjectPawn::equipShotgun()
-{ equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun"))); }
+{
+	AShotgun* newShotgun = NewObject<AShotgun>();
+	//newShotgun->World = GetWorld();
+	newShotgun->SetWorld(GetWorld());
+	newShotgun->FireSound = ConstructorHelpers::FObjectFinder<USoundBase>(TEXT("/Game/Audio/Shotgun_Blast")).Object;
+	equipShotgun(newShotgun);
+	//equipShotgun(NewObject<AShotgun>());
+}
 
 void AMyProjectPawn::equipAssaultRifle()
-{ equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR"))); }
+{
+	AAssaultRifle* newAR = NewObject<AAssaultRifle>();
+	//newAR->World = GetWorld();
+	newAR->SetWorld(GetWorld());
+	newAR->FireSound = ConstructorHelpers::FObjectFinder<USoundBase>(TEXT("/Game/Audio/Normal_Shot")).Object;
+	equipAssaultRifle(newAR);
+	//equipAssaultRifle(NewObject<AAssaultRifle>());
+}
 
 void AMyProjectPawn::equipMarksmanRifle()
-{ equipMarksmanRifle(CreateDefaultSubobject<AMarksmanRifle>(TEXT("Testing MR"))); }
+{
+	AMarksmanRifle* newMR = NewObject<AMarksmanRifle>();
+	//newMR->World = GetWorld();
+	newMR->SetWorld(GetWorld());
+	newMR->FireSound = ConstructorHelpers::FObjectFinder<USoundBase>(TEXT("/Game/Audio/Heavy_Shot")).Object;
+	equipMarksmanRifle(newMR);
+	//equipMarksmanRifle(NewObject<AMarksmanRifle>());
+}
 
 void AMyProjectPawn::SetWeaponsNull()
 {
@@ -89,6 +113,8 @@ AMyProjectPawn::AMyProjectPawn()
 	//defaultWeapon = FindObject<APistol>(GetLevel(), TEXT("Pistol1"));
 	CreateDefaultPistol();
 
+	//equipMarksmanRifle();
+	equipShotgun();
 	//equipShotgun(CreateDefaultSubobject<AShotgun>(TEXT("Testing Shotgun")));
 	//equipAssaultRifle(CreateDefaultSubobject<AAssaultRifle>(TEXT("Testing AR")));
 	//equipMarksmanRifle(CreateDefaultSubobject<AMarksmanRifle>(TEXT("Testing MR")));
@@ -99,6 +125,7 @@ AMyProjectPawn::AMyProjectPawn()
 	ShipMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ShipMesh"));
 	RootComponent = ShipMeshComponent;
 	ShipMeshComponent->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	ShipMeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 	ShipMeshComponent->SetStaticMesh(ShipMesh.Object);
 	
 	// Cache our sound effect

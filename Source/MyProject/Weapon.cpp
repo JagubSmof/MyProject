@@ -1,25 +1,34 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Weapon.h"
+#include "NormalProjectile.h"
 
 AWeapon::AWeapon()
 {
 	fireRate = 2;
 	coolDown = 0;
 	ammoCount = -1;
+	numberOfShots = 0;
 	// Cache our sound effect
 	static ConstructorHelpers::FObjectFinder<USoundBase> FireAudio(TEXT("/Game/TwinStick/Audio/TwinStickFire.TwinStickFire"));
 	FireSound = FireAudio.Object;
+	randomizeDirection = false;
 }
 
 AWeapon::~AWeapon()
 {
 }
 
+void AWeapon::SetWorld(UWorld* World)
+{
+	this->World = World;
+}
+
 bool AWeapon::FireWeapon(FVector SpawnLocation, FRotator FireRotation)
 {
 	if (coolDown <= 0)
 	{
+		secondShotCoolDown = secondShotDelay;
 		if (fireRate != 0)
 			coolDown = 1 / fireRate;
 		else
@@ -74,6 +83,37 @@ void AWeapon::Tick(float deltaTime)
 		return;
 	if (coolDown > 0)//&& ammoCount == 1
 		coolDown -= deltaTime;
+	//if (secondShotCoolDown > 0 && shotsToFire > 0 && numberOfShots)
+	//{
+	//	secondShotCoolDown -= deltaTime;
+	//	if (secondShotCoolDown < 0)
+	//	{
+	//		secondShotCoolDown = secondShotDelay;
+	//		//LaunchProjectile();
+	//	}
+	//}
+	if (shotsToFire > 0)
+	{
+		LaunchProjectileSet();
+		shotsToFire--;
+	}
+}
+
+void AWeapon::LaunchProjectileSet()
+{
+	if (randomizeDirection)
+	{
+		FRandomStream RandomStream;
+		RandomStream.GenerateNewSeed();
+		int random_number = RandomStream.RandRange(-15, 15);
+		NextFireRotation = FRotator(NextFireRotation.Pitch, NextFireRotation.Yaw + random_number, NextFireRotation.Roll);
+	}
+	if (World != NULL)
+	{
+		ANormalProjectile* projectile = World->SpawnActor<ANormalProjectile>(NextSpawnLocation, NextFireRotation);
+		if (projectile)
+			projectile->setLight(GetColour());
+	}
 }
 
 void AWeapon::LaunchProjectile(FVector SpawnLocation, FRotator FireRotation)

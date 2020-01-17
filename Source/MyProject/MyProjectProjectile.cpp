@@ -52,6 +52,7 @@ void AMyProjectProjectile::setDefaultProjectileMesh()
 	ProjectileMesh->SetupAttachment(RootComponent);
 	ProjectileMesh->BodyInstance.SetCollisionProfileName("Projectile");
 	ProjectileMesh->OnComponentHit.AddDynamic(this, &AMyProjectProjectile::OnHit);		// set up a notification for when this component hits something
+	ProjectileMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 	RootComponent = ProjectileMesh;
 	InitialLifeSpan = 3.0f;
 }

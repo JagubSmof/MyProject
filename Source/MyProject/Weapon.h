@@ -21,6 +21,18 @@ class AWeapon : public AActor
 
 public:
 
+	bool randomizeDirection;
+	UWorld* World;
+	FVector NextSpawnLocation;
+	FRotator NextFireRotation;
+	float secondShotCoolDown;
+	float secondShotDelay;
+	int shotsToFire;
+	int numberOfShots;
+
+	void LaunchProjectileSet();
+	void SetWorld(UWorld*);
+
 	FLinearColor GetColour();
 
 	/** Sound to play each time we fire */
